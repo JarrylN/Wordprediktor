@@ -47,3 +47,13 @@ First Token ID | Second Token ID | Natural Log Probability
 ```
 
 ## Transformer Model
+
+
+# Data 
+
+The project uses different datasets to train the models. 
+| Dataset | Description | Number of Tokens | Size | 
+|---|---|---|---|
+| `Wikitext-2` | Text from Wikipedia | ~2 Million Tokens | 10.83 MB |
+| `Wikitext-103` | Text from Wikipedia | ~100 Million Tokens | 539.21 MB | 
+
