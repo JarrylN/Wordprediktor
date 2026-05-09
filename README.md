@@ -8,17 +8,10 @@ This is a word predictor project which predicts the next words by either filling
 
 **N-gram**: The n-gram model takes the n-1 preceding words. 
 
-The n-gram probability of a word $w_i$ given the previous $n-1$ words is: 
+The n-gram probability of a word $w_i$ given the previous $n - 1$ words is:
 
-$$
-P(w_i \mid w_{i-n+1}, \ldots, w_{i-1})
-=
-\frac{
-\mathrm{Count}(w_{i-n+1}, \ldots, w_{i-1}, w_i)
-}{
-\mathrm{Count}(w_{i-n+1}, \ldots, w_{i-1})
-}
-$$
+$$ P(w_i \mid w_{i-n+1}, \ldots, w_{i-1}) = \frac{\mathrm{Count}(w_{i-n+1}, \ldots, w_{i-1}, w_i)}{\mathrm{Count}(w_{i-n+1}, \ldots, w_{i-1})} $$
+
 
 Where: 
 
