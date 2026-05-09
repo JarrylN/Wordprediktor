@@ -2,9 +2,9 @@
 
 This is a word predictor project which predicts the next words by either filling in unfinished words or suggesting the next word
 
-# Models
+## Models 🤖
 
-## N Gram Model
+### N Gram Model
 
 **N-gram**: The n-gram model takes the n-1 preceding words. 
 
@@ -39,14 +39,18 @@ Afterwards, the model takes the bigram probability between ID of the first and s
 First Token ID | Second Token ID | Natural Log Probability
 ```
 
-## Transformer Model
+### Transformer Model
 
 
-# Data 
+## Data 📈
 
 The project uses different datasets to train the models. 
 | Dataset | Description | Number of Tokens | Size | 
 |---|---|---|---|
 | `Wikitext-2` | Text from Wikipedia | ~2 Million Tokens | 10.83 MB |
 | `Wikitext-103` | Text from Wikipedia | ~100 Million Tokens | 539.21 MB | 
+
+## Usage Instructions 📋
+
+
 
