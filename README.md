@@ -80,5 +80,27 @@ The project uses different datasets to train the models.
 
 ## Usage Instructions 📋
 
-Models can be found here: https://doi.org/10.5281/zenodo.20475212
+1. **Download models:**
+    ````
+    Models can be found here: https://doi.org/10.5281/zenodo.20475212
+    ````
 
+2. **Clone the repository:**
+    ````
+   git clone https://github.com/JarrylN/Wordprediktor
+   cd word_predictor
+    ````
+
+3. **Create an activate a conda environment:**
+    ````
+    conda create --name word_predictor python=3.11 
+    conda activate word_predictor
+    ````
+4. **Install the required packages:**
+    ````
+    pip install -r requirements.txt
+    ````
+5. **Run the program:**
+    ````
+    python gui.py
+    ````
