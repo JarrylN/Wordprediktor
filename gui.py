@@ -2,8 +2,16 @@ import tkinter as tk
 from Generator import Generator
 
 NUMBER_OF_SUGGESTIONS = 3
-NGRAM_MODEL_FILE = "Wikitext2_model_ngram.txt"
 TRANSFORMER_MODEL_FILE = "" ##INSERT HERE the trained transformer file
+
+NGRAM_MODEL_FILES = {
+    ("openwebtext", "bigram"):  "openwebtext_bigram.txt",
+    ("openwebtext", "trigram"): "openwebtext_trigram.txt",
+    ("wikitext103",  "bigram"):  "wiki103_model_ngram.txt",
+    ("wikitext103",  "trigram"): "wiki103_model_trigram.txt",
+    ("wikitext2",   "bigram"):  "Wikitext2_model_ngram.txt",
+    ("wikitext2",   "trigram"): "Wikitext2_model_trigram.txt",
+}
 
 class NgramPredictorWrapper:
     def __init__(self, model_file):
@@ -18,7 +26,7 @@ class NgramPredictorWrapper:
 
 
 class TransformerPredictorWrapper:
-    def __init__(self):
+    def __init__(self, model_file=None):
         print("Transformer model selected")
 
     def predict(self, previous_word, prefix, k): ###Tong this one is not filled yet, just fill in later
@@ -38,37 +46,28 @@ class ModelSelectionGUI:
         self.root = root
         self.root.title("Choose Prediction Model")
 
-        self.label = tk.Label(
-            root,
-            text="Choose which model:",
-            font=("Cambria", 16)
-        )
-        self.label.pack(pady=20)
+        tk.Label(root, text="Choose which model:", font=("Cambria", 16)).pack(pady=20)
 
-        self.ngram_button = tk.Button(
+        tk.Button(
             root,
             text="Use N-gram Model",
             font=("Cambria", 14),
             width=25,
-            command=self.open_ngram_gui
-        )
-        self.ngram_button.pack(pady=10)
+            command=self.open_dataset_selection
+        ).pack(pady=10)
 
-        self.transformer_button = tk.Button(
+        tk.Button(
             root,
             text="Use Transformer Model",
             font=("Cambria", 14),
             width=25,
             command=self.open_transformer_gui
-        )
-        self.transformer_button.pack(pady=10)
+        ).pack(pady=10)
 
-    def open_ngram_gui(self):
-        predictor = NgramPredictorWrapper(NGRAM_MODEL_FILE)
+    def open_dataset_selection(self):
         self.root.destroy()
-
         new_root = tk.Tk()
-        WordPredictionGUI(new_root, predictor, "Word Prediction Using N-gram Model")
+        DatasetSelectionGUI(new_root)
         new_root.mainloop()
 
     def open_transformer_gui(self):
@@ -77,6 +76,82 @@ class ModelSelectionGUI:
 
         new_root = tk.Tk()
         WordPredictionGUI(new_root, predictor, "Word Prediction Using Transformer Model")
+        new_root.mainloop()
+
+
+class DatasetSelectionGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Choose Dataset")
+
+        tk.Label(root, text="Choose training dataset:", font=("Cambria", 16)).pack(pady=20)
+
+        datasets = [
+            ("OpenWebText", "openwebtext"),
+            ("Wikitext-103", "wikitext103"),
+            ("Wikitext-2",   "wikitext2"),
+        ]
+
+        for label, key in datasets:
+            tk.Button(
+                root,
+                text=label,
+                font=("Cambria", 14),
+                width=25,
+                command=lambda k=key: self.open_gram_selection(k)
+            ).pack(pady=10)
+
+    def open_gram_selection(self, dataset_key):
+        self.root.destroy()
+        new_root = tk.Tk()
+        GramSelectionGUI(new_root, dataset_key)
+        new_root.mainloop()
+
+
+class GramSelectionGUI:
+    def __init__(self, root, dataset_key):
+        self.root = root
+        self.dataset_key = dataset_key
+        self.root.title("Choose N-gram Order")
+
+        dataset_labels = {
+            "openwebtext": "OpenWebText",
+            "wikitext103":  "Wikitext-103",
+            "wikitext2":   "Wikitext-2",
+        }
+        label_text = f"Dataset: {dataset_labels[dataset_key]}\nChoose n-gram order:"
+        tk.Label(root, text=label_text, font=("Cambria", 16), justify="center").pack(pady=20)
+
+        tk.Button(
+            root,
+            text="Bigram",
+            font=("Cambria", 14),
+            width=25,
+            command=lambda: self.launch("bigram")
+        ).pack(pady=10)
+
+        tk.Button(
+            root,
+            text="Trigram",
+            font=("Cambria", 14),
+            width=25,
+            command=lambda: self.launch("trigram")
+        ).pack(pady=10)
+
+    def launch(self, gram_key):
+        model_file = NGRAM_MODEL_FILES[(self.dataset_key, gram_key)]
+        predictor = NgramPredictorWrapper(model_file)
+
+        dataset_labels = {
+            "openwebtext": "OpenWebText",
+            "wikitext103":  "Wikitext-103",
+            "wikitext2":   "Wikitext-2",
+        }
+        title = f"N-gram ({gram_key.capitalize()}) — {dataset_labels[self.dataset_key]}"
+
+        self.root.destroy()
+        new_root = tk.Tk()
+        WordPredictionGUI(new_root, predictor, title)
         new_root.mainloop()
 
 
