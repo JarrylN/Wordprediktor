@@ -1,4 +1,5 @@
 import tkinter as tk
+import Levenshtein
 from Generator import Generator
 
 NUMBER_OF_SUGGESTIONS = 3
@@ -39,6 +40,28 @@ class TransformerPredictorWrapper:
                 suggestions.append(word)
 
         return suggestions[:k]
+
+
+def get_levenshtein_corrections(vocab, previous_word, prefix, top_k=3):
+    """Return top_k spelling corrections for prefix using Levenshtein distance,
+    re-ranked by n-gram context if a previous_word is available."""
+    if not prefix or not vocab:
+        return []
+
+    prefix_lower = prefix.lower()
+    scored = [
+        (Levenshtein.distance(prefix_lower, v), v)
+        for v in vocab
+        if v not in ("<PAD>", "<UNK>") and v.isalpha()
+    ]
+    if not scored:
+        return []
+
+    min_dist = min(d for d, _ in scored)
+
+    candidates = [v for d, v in scored if d <= min_dist + 1]
+
+    return candidates[:top_k]
 
 
 class ModelSelectionGUI:
@@ -162,6 +185,11 @@ class WordPredictionGUI:
 
         self.predictor = predictor
 
+        # Grab vocab from n-gram model if available, for spell correction
+        self.vocab = []
+        if hasattr(predictor, "model") and hasattr(predictor.model, "vocab"):
+            self.vocab = list(predictor.model.vocab)
+
         self.label = tk.Label(
             root,
             text=title_text,
@@ -181,7 +209,7 @@ class WordPredictionGUI:
         self.text_box.bind("<Tab>", self.autofill_best_suggestion)
 
         self.suggestion_frame = tk.Frame(root)
-        self.suggestion_frame.pack(pady=10)
+        self.suggestion_frame.pack(pady=5)
 
         self.suggestion_buttons = []
         self.display_order = [1, 0, 2]
@@ -200,7 +228,28 @@ class WordPredictionGUI:
             button.grid(row=0, column=button_position, padx=5)
             self.suggestion_buttons.append(button)
 
+        # Spell correction row
+        tk.Label(root, text="Spell corrections:", font=("Cambria", 11, "italic")).pack()
+
+        self.correction_frame = tk.Frame(root)
+        self.correction_frame.pack(pady=5)
+
+        self.correction_buttons = []
+        for i in range(NUMBER_OF_SUGGESTIONS):
+            btn = tk.Button(
+                self.correction_frame,
+                text="",
+                font=("Cambria", 12),
+                width=12,
+                fg="darkblue",
+                state="disabled",
+                command=lambda idx=i: self.apply_correction(idx)
+            )
+            btn.grid(row=0, column=i, padx=5)
+            self.correction_buttons.append(btn)
+
         self.current_suggestions = []
+        self.current_corrections = []
 
     def get_context_and_prefix(self):
         text = self.text_box.get("1.0", "end-1c")
@@ -235,6 +284,38 @@ class WordPredictionGUI:
 
         self.current_suggestions = suggestions
         self.update_buttons(suggestions)
+        known = prefix.lower() in [v.lower() for v in self.vocab] if self.vocab else True
+        if prefix and not known:
+            corrections = get_levenshtein_corrections(self.vocab, previous_word, prefix, top_k=NUMBER_OF_SUGGESTIONS)
+        else:
+            corrections = []
+
+        self.current_corrections = corrections
+        self.update_correction_buttons(corrections)
+
+    def update_correction_buttons(self, corrections):
+        for i, btn in enumerate(self.correction_buttons):
+            if i < len(corrections):
+                btn.config(text=corrections[i], state="normal")
+            else:
+                btn.config(text="", state="disabled")
+
+    def apply_correction(self, index):
+        if index >= len(self.current_corrections):
+            return
+
+        correction = self.current_corrections[index]
+        text = self.text_box.get("1.0", "end-1c")
+
+        if not text or text.endswith(" "):
+            self.text_box.insert("end", correction + " ")
+        else:
+            words = text.split()
+            prefix = words[-1]
+            self.text_box.delete(f"end-{len(prefix) + 1}c", "end-1c")
+            self.text_box.insert("end", correction + " ")
+
+        self.on_text_changed()
 
     def update_buttons(self, suggestions):
         for button_position, button in enumerate(self.suggestion_buttons):
