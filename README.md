@@ -82,7 +82,7 @@ The project uses different datasets to train the models.
 
 1. **Download models:**
     ````
-    Models can be found here: https://doi.org/10.5281/zenodo.20475212
+    Models can be found here: https://doi.org/10.5281/zenodo.20476949
     ````
 
 2. **Clone the repository:**
