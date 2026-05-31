@@ -1,6 +1,6 @@
 # Wordprediktor 📇
 
-This is a word predictor project which predicts the next words by either filling in unfinished words or suggesting the next word
+This is a word predictor project which predicts the next words by either filling in unfinished words, suggesting the next word or correct spelling mistakes.
 
 ## Models 🤖
 
@@ -41,6 +41,32 @@ First Token ID | Second Token ID | Natural Log Probability
 
 ### Transformer Model
 
+The transformer model is a lightweight GPT-style word predictor.
+
+**Architecture**:
+
+| Hyperparameter | Value |
+|---|---|
+| Embedding dimension | 64 |
+| Attention heads | 2 |
+| Transformer layers | 1 |
+| Feedforward hidden dim | 128 |
+| Context window (`SEQ_LEN`) | 10 tokens |
+| Dropout | 0.1 |
+
+The model combines a token embedding and a learned positional embedding, then passes the sequence through a `TransformerEncoder` with a causal (upper-triangular) mask to prevent attending to future tokens. The final token's hidden state is projected via a linear layer to produce logits over the vocabulary.
+
+**Tokenization**:
+Text is lowercased, punctuation is stripped, and the top 10,000 most frequent words form the vocabulary. Unknown words are mapped to `<UNK>`.
+
+## Functionalities 🔧
+
+**Unfinished Word**: Given a partial token, model will retrieve vocabulary entries that token names start with the prefix, returning top-k most likely completions. 
+
+**Next Word**: Given a compelte sentence of words, n-gram looks at final n-1 word and return highest log probability for proceeding word. 
+Transformer model will encode full context and sample and predict next token from output distribution. 
+
+**Spelling Mistake**: Given input token (In the case of spelling mistakes) not found in vocabulary, model computes Levenshtein distance and return closest match by distance. 
 
 ## Data 📈
 
@@ -49,8 +75,10 @@ The project uses different datasets to train the models.
 |---|---|---|---|
 | `Wikitext-2` | Text from Wikipedia | ~2 Million Tokens | 10.83 MB |
 | `Wikitext-103` | Text from Wikipedia | ~100 Million Tokens | 539.21 MB | 
+| `OpenWebText (10k-document subset)` | WebText dataset from OpenAI to train GPT-2. For computational efficiency, only the first 10,000 documents were used | ~10–20+ million* | Subset of full dataset |
+
 
 ## Usage Instructions 📋
 
-
+Models can be found here: https://doi.org/10.5281/zenodo.20475212
 
