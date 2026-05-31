@@ -88,13 +88,13 @@ The project uses different datasets to train the models.
 2. **Clone the repository:**
     ````
    git clone https://github.com/JarrylN/Wordprediktor
-   cd word_predictor
+   cd Wordprediktor
     ````
 
 3. **Create an activate a conda environment:**
     ````
-    conda create --name word_predictor python=3.11 
-    conda activate word_predictor
+    conda create --name Wordprediktor python=3.11 
+    conda activate Wordprediktor
     ````
 4. **Install the required packages:**
     ````
