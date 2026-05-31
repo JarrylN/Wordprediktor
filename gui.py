@@ -187,8 +187,8 @@ class WordPredictionGUI:
 
         # Grab vocab from n-gram model if available, for spell correction
         self.vocab = []
-        if hasattr(predictor, "model") and hasattr(predictor.model, "vocab"):
-            self.vocab = list(predictor.model.vocab)
+        if hasattr(predictor, "model"):
+            self.vocab = list(predictor.model.index.keys())
 
         self.label = tk.Label(
             root,
